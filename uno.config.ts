@@ -4,7 +4,22 @@ import { presetUno, presetAttributify, presetIcons, transformerVariantGroup } fr
 
 export default defineConfig({
   // 使用Unocss
-  presets: [presetUno(), presetAttributify(), presetIcons()],
+  presets: [
+    presetUno(),
+    presetAttributify(),
+    presetIcons({
+      // 确保能使用FontAwesome图标
+      collections: {
+        'fa-solid': () => import('@iconify-json/fa-solid').then((i) => i.icons),
+        'fa-regular': () => import('@iconify-json/fa-regular').then((i) => i.icons),
+        'fa-brands': () => import('@iconify-json/fa-brands').then((i) => i.icons)
+      },
+      extraProperties: {
+        display: 'inline-block',
+        'vertical-align': 'middle'
+      }
+    })
+  ],
   shortcuts: [
     {
       fc: 'flex justify-center items-center',

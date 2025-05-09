@@ -89,25 +89,35 @@ const applyGradient = (index: number) => {
   cardStore.applyGradient(index)
 }
 
-// 贴纸数据
+// 贴纸数据 - 扩展贴纸列表
 const availableStickers = [
   { id: 1, type: 'emoji', url: '😊', width: 60, height: 60 },
   { id: 2, type: 'emoji', url: '🎉', width: 60, height: 60 },
   { id: 3, type: 'emoji', url: '💖', width: 60, height: 60 },
   { id: 4, type: 'emoji', url: '🌟', width: 60, height: 60 },
   { id: 5, type: 'emoji', url: '🎨', width: 60, height: 60 },
-  { id: 6, type: 'emoji', url: '📝', width: 60, height: 60 }
+  { id: 6, type: 'emoji', url: '📝', width: 60, height: 60 },
+  { id: 7, type: 'emoji', url: '🌈', width: 60, height: 60 },
+  { id: 8, type: 'emoji', url: '✨', width: 60, height: 60 },
+  { id: 9, type: 'emoji', url: '🔥', width: 60, height: 60 },
+  { id: 10, type: 'emoji', url: '💯', width: 60, height: 60 },
+  { id: 11, type: 'emoji', url: '🎵', width: 60, height: 60 },
+  { id: 12, type: 'emoji', url: '🎀', width: 60, height: 60 }
 ]
 
 // 添加贴纸
 const addSticker = (sticker: any) => {
-  // 给贴纸一个唯一 ID
+  // 获取画布尺寸
+  const canvasWidth = cardStore.canvasWidth
+  const canvasHeight = cardStore.canvasHeight
+
+  // 给贴纸一个唯一 ID，并放置在画布中央位置
   const newSticker = {
     id: Date.now(),
     type: sticker.type,
     url: sticker.url,
-    x: 100, // 初始 x 位置
-    y: 100, // 初始 y 位置
+    x: (canvasWidth - sticker.width) / 2, // 水平居中
+    y: (canvasHeight - sticker.height) / 2, // 垂直居中
     width: sticker.width,
     height: sticker.height,
     rotation: 0
@@ -127,26 +137,32 @@ const addSticker = (sticker: any) => {
     </div>
 
     <!-- 选项卡 -->
-    <el-tabs v-model="activeTab">
+    <el-tabs v-model="activeTab" class="transition-all duration-300">
       <!-- 文字设置选项卡 -->
       <el-tab-pane label="文字" name="text">
         <!-- 文本输入 -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">文本内容</label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-sm font-medium text-gray-700">文本内容</label>
+            <el-tooltip content="支持换行，可拖拽调整位置">
+              <i class="i-fa-solid:info-circle text-gray-400"></i>
+            </el-tooltip>
+          </div>
           <el-input
             v-model="text"
             type="textarea"
             :rows="4"
-            placeholder="输入文字内容"
-            maxlength="100"
+            placeholder="输入文字内容，支持换行"
+            maxlength="200"
             show-word-limit
+            class="transition-all hover:shadow-sm"
           />
         </div>
 
         <!-- 字体设置 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-1">字体</label>
-          <el-select v-model="fontFamily" class="w-full">
+          <el-select v-model="fontFamily" class="w-full transition-all hover:shadow-sm">
             <el-option
               v-for="option in fontOptions"
               :key="option.value"
@@ -166,7 +182,7 @@ const addSticker = (sticker: any) => {
         <!-- 字体粗细 -->
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-1">字体粗细</label>
-          <el-select v-model="fontWeight" class="w-full">
+          <el-select v-model="fontWeight" class="w-full transition-all hover:shadow-sm">
             <el-option
               v-for="option in fontWeightOptions"
               :key="option.value"
@@ -184,16 +200,42 @@ const addSticker = (sticker: any) => {
 
         <!-- 文本对齐 -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">文本对齐</label>
-          <el-radio-group v-model="textAlign" class="w-full flex justify-between">
-            <el-radio-button
-              v-for="option in textAlignOptions"
-              :key="option.value"
-              :label="option.value"
+          <label class="block text-sm font-medium text-gray-700 mb-2">文本对齐</label>
+          <div class="flex justify-between bg-gray-100 rounded-lg p-1">
+            <button
+              class="flex-1 flex items-center justify-center p-2 rounded-md transition-all duration-200 outline-none cursor-pointer"
+              :class="[
+                textAlign === 'left'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-50'
+              ]"
+              @click="textAlign = 'left'"
             >
-              {{ option.label }}
-            </el-radio-button>
-          </el-radio-group>
+              <i class="i-tabler-align-left text-lg"></i>
+            </button>
+            <button
+              class="flex-1 flex items-center justify-center p-2 rounded-md transition-all duration-200 outline-none cursor-pointer"
+              :class="[
+                textAlign === 'center'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-50'
+              ]"
+              @click="textAlign = 'center'"
+            >
+              <i class="i-tabler-align-center text-lg"></i>
+            </button>
+            <button
+              class="flex-1 flex items-center justify-center p-2 rounded-md transition-all duration-200 outline-none cursor-pointer"
+              :class="[
+                textAlign === 'right'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-50'
+              ]"
+              @click="textAlign = 'right'"
+            >
+              <i class="i-tabler-align-right text-lg"></i>
+            </button>
+          </div>
         </div>
       </el-tab-pane>
 
@@ -214,19 +256,22 @@ const addSticker = (sticker: any) => {
         </div>
 
         <!-- 纯色背景设置 -->
-        <div v-if="backgroundType === 'solid'" class="mb-4">
+        <div v-if="backgroundType === 'solid'" class="mb-4 transition-all duration-300 ease-in-out">
           <label class="block text-sm font-medium text-gray-700 mb-1">背景颜色</label>
           <el-color-picker v-model="backgroundColor" class="w-full" show-alpha />
         </div>
 
         <!-- 渐变背景设置 -->
-        <div v-if="backgroundType === 'gradient'" class="mb-4">
+        <div
+          v-if="backgroundType === 'gradient'"
+          class="mb-4 transition-all duration-300 ease-in-out"
+        >
           <label class="block text-sm font-medium text-gray-700 mb-1">渐变背景</label>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-3">
             <div
               v-for="(gradient, index) in gradientPresets"
               :key="gradient.id"
-              class="h-16 rounded-lg cursor-pointer overflow-hidden"
+              class="h-20 rounded-lg cursor-pointer overflow-hidden transform transition-transform hover:scale-105 hover:shadow-md"
               :style="{
                 background: `linear-gradient(${gradient.direction}, ${gradient.colors.join(', ')})`
               }"
@@ -239,23 +284,33 @@ const addSticker = (sticker: any) => {
       <!-- 贴纸选项卡 -->
       <el-tab-pane label="贴纸" name="stickers">
         <div class="mb-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">选择贴纸</label>
-          <p class="text-xs text-gray-500 mb-2">点击添加到画布</p>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div
-            v-for="sticker in availableStickers"
-            :key="sticker.id"
-            class="h-16 flex items-center justify-center border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50"
-            @click="addSticker(sticker)"
-          >
-            <span class="text-3xl">{{ sticker.url }}</span>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-sm font-medium text-gray-700">选择贴纸</label>
+            <el-tooltip content="点击添加到画布">
+              <i class="i-fa-solid:info-circle text-gray-400"></i>
+            </el-tooltip>
           </div>
         </div>
 
-        <div class="mt-4">
-          <p class="text-xs text-gray-500">注意：目前贴纸功能仅支持添加，暂不支持移动和调整位置</p>
+        <div class="grid grid-cols-4 gap-3">
+          <div
+            v-for="sticker in availableStickers"
+            :key="sticker.id"
+            class="h-14 flex items-center justify-center border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transform transition-transform hover:scale-110 hover:shadow-sm"
+            @click="addSticker(sticker)"
+          >
+            <span class="text-2xl">{{ sticker.url }}</span>
+          </div>
+        </div>
+
+        <div class="mt-4 bg-blue-50 p-3 rounded-lg text-sm">
+          <div class="flex">
+            <i class="i-fa-solid:lightbulb text-yellow-500 mr-2 text-lg"></i>
+            <div>
+              <p class="text-gray-700">贴纸已支持随机位置添加，避免重叠。</p>
+              <p class="text-gray-500 text-xs mt-1">注意：下一版本将支持拖拽调整位置</p>
+            </div>
+          </div>
         </div>
       </el-tab-pane>
     </el-tabs>

@@ -32,6 +32,7 @@ export interface Sticker {
   width: number
   height: number
   rotation: number
+  scale?: number
 }
 
 export const useCardStore = defineStore(
@@ -40,19 +41,25 @@ export const useCardStore = defineStore(
     // 文本内容
     const text = ref('')
 
-    // 画布尺寸（默认为常见社交媒体比例 1080x1920）
-    const canvasWidth = ref(1080)
-    const canvasHeight = ref(1920)
+    // 画布尺寸（修改为更合理的尺寸）
+    const canvasWidth = ref(500)
+    const canvasHeight = ref(700)
 
     // 当前选中的模板索引
     const selectedTemplateIndex = ref(0)
 
     // 当前模板的字体设置
     const fontFamily = ref('SimHei, sans-serif')
-    const fontSize = ref(36)
+    const fontSize = ref(24)
     const fontWeight = ref(400)
     const textColor = ref('#333333')
     const textAlign = ref('center')
+
+    // 文本位置和尺寸
+    const textX = ref(0)
+    const textY = ref(0)
+    const textWidth = ref(400)
+    const textHeight = ref(200)
 
     // 渐变背景设置
     const backgroundType = ref('gradient') // 'solid', 'gradient', 'image'
@@ -108,6 +115,28 @@ export const useCardStore = defineStore(
         backgroundColor: '#2e8b57',
         gradientType: 'linear',
         borderRadius: 8
+      },
+      {
+        id: 5,
+        name: '樱花粉',
+        layout: 'center',
+        fontFamily: 'Microsoft YaHei, sans-serif',
+        fontSize: 34,
+        textColor: '#ffffff',
+        backgroundColor: '#ff9a9e',
+        gradientType: 'linear',
+        borderRadius: 20
+      },
+      {
+        id: 6,
+        name: '深蓝质感',
+        layout: 'bottom',
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 36,
+        textColor: '#ffffff',
+        backgroundColor: '#1e3c72',
+        gradientType: 'linear',
+        borderRadius: 4
       }
     ])
 
@@ -142,6 +171,24 @@ export const useCardStore = defineStore(
         name: '黄昏',
         colors: ['#F83600', '#F9D423'],
         direction: 'to top'
+      },
+      {
+        id: 6,
+        name: '薄雾青',
+        colors: ['#74EBD5', '#9FACE6'],
+        direction: 'to right'
+      },
+      {
+        id: 7,
+        name: '深夜蓝',
+        colors: ['#0F2027', '#203A43', '#2C5364'],
+        direction: 'to bottom'
+      },
+      {
+        id: 8,
+        name: '温暖橙',
+        colors: ['#FF512F', '#F09819'],
+        direction: 'to right'
       }
     ])
 
@@ -166,6 +213,9 @@ export const useCardStore = defineStore(
       fontSize.value = template.fontSize
       textColor.value = template.textColor
 
+      // 重置文本位置为中心
+      resetTextPosition()
+
       if (template.gradientType === 'none') {
         backgroundType.value = 'solid'
         backgroundColor.value = template.backgroundColor
@@ -174,6 +224,27 @@ export const useCardStore = defineStore(
         // 应用默认渐变
         applyGradient(0)
       }
+    }
+
+    // 重置文本位置到中心
+    function resetTextPosition() {
+      // 水平居中，垂直居中略微偏上
+      textX.value = canvasWidth.value / 2 - textWidth.value / 2 // 文本宽度的一半
+      textY.value = canvasHeight.value / 2 - textHeight.value / 2 // 文本高度的一半，略微偏上
+      // 设置文本对齐方式为居中
+      textAlign.value = 'center'
+    }
+
+    // 设置文本位置
+    function setTextPosition(x: number, y: number) {
+      textX.value = x
+      textY.value = y
+    }
+
+    // 设置文本尺寸
+    function setTextSize(width: number, height: number) {
+      textWidth.value = width
+      textHeight.value = height
     }
 
     // 应用渐变
@@ -185,12 +256,48 @@ export const useCardStore = defineStore(
 
     // 添加贴纸
     function addSticker(sticker: Sticker) {
-      stickers.value.push(sticker)
+      stickers.value.push({
+        ...sticker,
+        scale: 1
+      })
     }
 
     // 删除贴纸
     function removeSticker(id: number) {
       stickers.value = stickers.value.filter((sticker) => sticker.id !== id)
+    }
+
+    // 更新贴纸位置
+    function updateStickerPosition(id: number, x: number, y: number) {
+      const sticker = stickers.value.find((s) => s.id === id)
+      if (sticker) {
+        sticker.x = x
+        sticker.y = y
+      }
+    }
+
+    // 更新贴纸全部属性
+    function updateSticker(id: number, newSticker: Partial<Sticker>) {
+      const index = stickers.value.findIndex((s) => s.id === id)
+      if (index !== -1) {
+        stickers.value[index] = { ...stickers.value[index], ...newSticker }
+      }
+    }
+
+    // 旋转贴纸
+    function rotateSsticker(id: number, rotation: number) {
+      const sticker = stickers.value.find((s) => s.id === id)
+      if (sticker) {
+        sticker.rotation = rotation
+      }
+    }
+
+    // 缩放贴纸
+    function scaleSsticker(id: number, scale: number) {
+      const sticker = stickers.value.find((s) => s.id === id)
+      if (sticker) {
+        sticker.scale = scale
+      }
     }
 
     // 设置文本
@@ -202,6 +309,9 @@ export const useCardStore = defineStore(
     function setCanvasSize(width: number, height: number) {
       canvasWidth.value = width
       canvasHeight.value = height
+
+      // 调整尺寸后重置文本位置
+      resetTextPosition()
     }
 
     return {
@@ -214,6 +324,10 @@ export const useCardStore = defineStore(
       fontWeight,
       textColor,
       textAlign,
+      textX,
+      textY,
+      textWidth,
+      textHeight,
       backgroundType,
       backgroundColor,
       gradientColors,
@@ -228,7 +342,14 @@ export const useCardStore = defineStore(
       applyTemplate,
       applyGradient,
       addSticker,
-      removeSticker
+      removeSticker,
+      updateStickerPosition,
+      updateSticker,
+      rotateSsticker,
+      scaleSsticker,
+      setTextPosition,
+      resetTextPosition,
+      setTextSize
     }
   },
   {
@@ -236,8 +357,28 @@ export const useCardStore = defineStore(
       enabled: true,
       strategies: [
         {
-          key: 'card-editor',
-          storage: localStorage
+          key: 'text-card-store',
+          storage: localStorage,
+          paths: [
+            'text',
+            'canvasWidth',
+            'canvasHeight',
+            'selectedTemplateIndex',
+            'fontFamily',
+            'fontSize',
+            'fontWeight',
+            'textColor',
+            'textAlign',
+            'textX',
+            'textY',
+            'textWidth',
+            'textHeight',
+            'backgroundType',
+            'backgroundColor',
+            'gradientColors',
+            'gradientDirection',
+            'stickers'
+          ]
         }
       ]
     }

@@ -20,9 +20,14 @@
     "pinia": "^2.0.32",
     "pinia-plugin-persist": "^1.0.0",
     "vue": "^3.2.47",
+    "vue-draggable-resizable": "^3.0.0",
+    "vue-draggable-resizable-next": "^1.0.7",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@iconify-json/fa-brands": "^1.2.1",
+    "@iconify-json/fa-regular": "^1.2.1",
+    "@iconify-json/fa-solid": "^1.2.1",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/node": "^18.14.2",
     "@unocss/preset-attributify": "^0.51.4",

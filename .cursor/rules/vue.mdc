@@ -1,0 +1,9 @@
+---
+description: always use this rules
+globs: 
+alwaysApply: false
+---
+
+这是一个基于vue3 + ts + unocss  + element-plus + pinia 的前端项目，请在此基础上进行应用架构，如果有需要新引入的第三方npm库，你可以自己引入，字体图标你可以用fontawasome，style必须使用内联的unocss方式，没办法写的情况下，可以使用style标签
+
+vue组件里，script标签始终位于template标签上面，必须使用 ts 以及setup语法
