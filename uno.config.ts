@@ -8,11 +8,13 @@ export default defineConfig({
     presetUno(),
     presetAttributify(),
     presetIcons({
-      // 确保能使用FontAwesome图标
+      // 使用Iconify图标
+      scale: 1.2,
+      warn: true,
       collections: {
-        'fa-solid': () => import('@iconify-json/fa-solid').then((i) => i.icons),
-        'fa-regular': () => import('@iconify-json/fa-regular').then((i) => i.icons),
-        'fa-brands': () => import('@iconify-json/fa-brands').then((i) => i.icons)
+        'fa-solid': () => import('@iconify/json/json/fa-solid.json').then((i) => i.default),
+        'fa-regular': () => import('@iconify/json/json/fa-regular.json').then((i) => i.default),
+        'fa-brands': () => import('@iconify/json/json/fa-brands.json').then((i) => i.default)
       },
       extraProperties: {
         display: 'inline-block',
