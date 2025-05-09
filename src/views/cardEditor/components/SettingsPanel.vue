@@ -49,6 +49,24 @@ const backgroundColor = computed({
   set: (val) => (cardStore.backgroundColor = val)
 })
 
+// 全局设置 - 新增
+const canvasRadius = computed({
+  get: () => cardStore.canvasRadius,
+  set: (val) => (cardStore.canvasRadius = val)
+})
+
+const canvasShadow = computed({
+  get: () => cardStore.canvasShadow,
+  set: (val) => (cardStore.canvasShadow = val)
+})
+
+// 模板相关 - 从TemplatePanel迁移过来
+const templates = computed(() => cardStore.templates)
+const selectedTemplateIndex = computed({
+  get: () => cardStore.selectedTemplateIndex,
+  set: (val) => cardStore.applyTemplate(val)
+})
+
 // 可用字体列表
 const fontOptions = [
   { label: '黑体', value: 'SimHei, sans-serif' },
@@ -78,7 +96,16 @@ const textAlignOptions = [
 // 背景类型选项
 const backgroundTypeOptions = [
   { label: '纯色背景', value: 'solid' },
-  { label: '渐变背景', value: 'gradient' }
+  { label: '渐变背景', value: 'gradient' },
+  { label: '模板', value: 'template' } // 新增模板选项
+]
+
+// 阴影预设选项
+const shadowPresets = [
+  { label: '无阴影', value: 'none' },
+  { label: '轻微阴影', value: '0 4px 6px rgba(0, 0, 0, 0.1)' },
+  { label: '中等阴影', value: '0 8px 30px rgba(0, 0, 0, 0.12)' },
+  { label: '深色阴影', value: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }
 ]
 
 // 渐变预设
@@ -87,6 +114,11 @@ const gradientPresets = computed(() => cardStore.gradientPresets)
 // 应用渐变预设
 const applyGradient = (index: number) => {
   cardStore.applyGradient(index)
+}
+
+// 应用模板 - 从TemplatePanel迁移过来
+const applyTemplate = (index: number) => {
+  cardStore.applyTemplate(index)
 }
 
 // 贴纸数据 - 扩展贴纸列表
@@ -126,6 +158,11 @@ const addSticker = (sticker: any) => {
   cardStore.addSticker(newSticker)
   ElMessage.success('贴纸已添加')
 }
+
+// 选择阴影预设
+const selectShadowPreset = (shadowValue: string) => {
+  canvasShadow.value = shadowValue
+}
 </script>
 
 <template>
@@ -138,6 +175,36 @@ const addSticker = (sticker: any) => {
 
     <!-- 选项卡 -->
     <el-tabs v-model="activeTab" class="transition-all duration-300">
+      <!-- 全局设置选项卡 - 新增 -->
+      <el-tab-pane label="全局" name="global">
+        <!-- 画布圆角设置 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">画布圆角</label>
+          <el-slider v-model="canvasRadius" :min="0" :max="40" show-input />
+        </div>
+
+        <!-- 画布阴影设置 -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">画布阴影</label>
+          <div class="grid grid-cols-2 gap-3 mb-2">
+            <div
+              v-for="(shadow, index) in shadowPresets"
+              :key="index"
+              class="h-16 rounded-lg cursor-pointer overflow-hidden transform transition-transform border border-gray-200 flex items-center justify-center"
+              :class="[
+                canvasShadow === shadow.value
+                  ? 'ring-2 ring-blue-500 scale-105'
+                  : 'hover:scale-102 hover:shadow-sm'
+              ]"
+              :style="{ boxShadow: shadow.value === 'none' ? 'none' : shadow.value }"
+              @click="selectShadowPreset(shadow.value)"
+            >
+              <span class="text-xs text-gray-500">{{ shadow.label }}</span>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+
       <!-- 文字设置选项卡 -->
       <el-tab-pane label="文字" name="text">
         <!-- 文本输入 -->
@@ -277,6 +344,67 @@ const addSticker = (sticker: any) => {
               }"
               @click="applyGradient(index)"
             ></div>
+          </div>
+        </div>
+
+        <!-- 模板选择设置 - 迁移自TemplatePanel -->
+        <div
+          v-if="backgroundType === 'template'"
+          class="mb-4 transition-all duration-300 ease-in-out"
+        >
+          <label class="block text-sm font-medium text-gray-700 mb-1">模板风格</label>
+          <div class="grid grid-cols-2 gap-3">
+            <div
+              v-for="(template, index) in templates"
+              :key="template.id"
+              class="cursor-pointer transition-all duration-300 rounded-lg overflow-hidden transform"
+              :class="[
+                selectedTemplateIndex === index
+                  ? 'ring-2 ring-blue-500 scale-105'
+                  : 'hover:shadow-sm hover:scale-102'
+              ]"
+              @click="applyTemplate(index)"
+            >
+              <!-- 模板预览 -->
+              <div
+                class="aspect-[9/16] flex items-center justify-center p-3 relative border border-gray-200 shadow-sm"
+                :style="{
+                  backgroundColor: template.backgroundColor,
+                  borderRadius: `${template.borderRadius}px`,
+                  color: template.textColor,
+                  fontFamily: template.fontFamily
+                }"
+              >
+                <div
+                  class="text-center truncate"
+                  :style="{ fontSize: `${template.fontSize / 4}px` }"
+                >
+                  {{ template.name }}
+                </div>
+
+                <!-- 选中指示器 -->
+                <div
+                  v-if="selectedTemplateIndex === index"
+                  class="absolute inset-0 border-2 border-blue-500 rounded-lg flex items-center justify-center"
+                >
+                  <div
+                    class="absolute top-1 right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                  >
+                    <i class="i-tabler-check text-xs"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 模板名称 -->
+              <div
+                class="py-2 px-2 bg-white text-center"
+                :class="[
+                  selectedTemplateIndex === index ? 'text-blue-600 font-medium' : 'text-gray-700'
+                ]"
+              >
+                <span class="text-xs">{{ template.name }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </el-tab-pane>

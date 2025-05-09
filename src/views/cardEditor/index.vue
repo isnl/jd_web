@@ -50,7 +50,7 @@ onMounted(() => {
       <button
         class="absolute left-0 top-1/2 z-10 bg-white rounded-r-lg shadow-md p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-all duration-300"
         @click="toggleLeftPanel"
-        :class="{ 'translate-x-64': leftPanelVisible }"
+        :class="{ 'translate-x-72': leftPanelVisible }"
       >
         <i
           :class="leftPanelVisible ? 'i-tabler-chevron-left' : 'i-tabler-chevron-right'"
@@ -60,8 +60,8 @@ onMounted(() => {
 
       <!-- 左侧模板面板 -->
       <el-scrollbar
-        class="w-64 border-r border-gray-200 bg-white transition-all duration-300"
-        :class="{ '-ml-64': !leftPanelVisible }"
+        class="w-72 border-r border-gray-200 bg-white transition-all duration-300"
+        :class="{ '-ml-72': !leftPanelVisible }"
       >
         <TemplatePanel />
       </el-scrollbar>

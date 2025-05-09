@@ -24,6 +24,8 @@ const backgroundColor = computed(() => cardStore.backgroundColor)
 const backgroundGradient = computed(() => cardStore.backgroundGradient)
 const stickers = computed(() => cardStore.stickers)
 const currentTemplate = computed(() => cardStore.currentTemplate)
+const canvasRadius = computed(() => cardStore.canvasRadius)
+const canvasShadow = computed(() => cardStore.canvasShadow)
 
 // 文本位置和大小
 const textPosition = computed({
@@ -365,12 +367,13 @@ watch([canvasWidth, canvasHeight], () => {
   >
     <div
       id="card-canvas"
-      class="relative shadow-lg transition-all duration-300"
+      class="relative transition-all duration-300"
       :style="{
         width: `${canvasWidth}px`,
         height: `${canvasHeight}px`,
         transform: `scale(${scale})`,
-        borderRadius: `${currentTemplate.borderRadius}px`,
+        borderRadius: `${canvasRadius}px`,
+        boxShadow: canvasShadow,
         ...cardBackgroundStyle
       }"
       @click="handleCanvasClick"

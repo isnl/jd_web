@@ -45,6 +45,10 @@ export const useCardStore = defineStore(
     const canvasWidth = ref(500)
     const canvasHeight = ref(700)
 
+    // 全局设置 - 新增
+    const canvasRadius = ref(12) // 画布圆角
+    const canvasShadow = ref('0 8px 30px rgba(0, 0, 0, 0.12)') // 画布阴影
+
     // 当前选中的模板索引
     const selectedTemplateIndex = ref(0)
 
@@ -318,6 +322,8 @@ export const useCardStore = defineStore(
       text,
       canvasWidth,
       canvasHeight,
+      canvasRadius,
+      canvasShadow,
       selectedTemplateIndex,
       fontFamily,
       fontSize,
@@ -363,6 +369,8 @@ export const useCardStore = defineStore(
             'text',
             'canvasWidth',
             'canvasHeight',
+            'canvasRadius',
+            'canvasShadow',
             'selectedTemplateIndex',
             'fontFamily',
             'fontSize',
