@@ -8,6 +8,7 @@ const inputText = ref('')
 const maxLength = 100
 const isGenerating = ref(false)
 
+// 生成卡片 - 跳转到卡片列表页面
 const generateCard = () => {
   if (!inputText.value.trim()) {
     ElMessage.warning('请输入文字内容')
@@ -16,15 +17,29 @@ const generateCard = () => {
 
   isGenerating.value = true
 
-  // 将文字内容存储到 localStorage，方便编辑页面获取
+  // 将文字内容存储到 localStorage，方便卡片列表页面获取
   localStorage.setItem('cardText', inputText.value)
 
   // 模拟加载效果
   setTimeout(() => {
-    // 跳转到编辑页面
-    router.push('/editor')
+    // 跳转到卡片列表页面
+    router.push('/card-list')
     isGenerating.value = false
   }, 600)
+}
+
+// 设计卡片 - 跳转到编辑器页面
+const designCard = () => {
+  if (!inputText.value.trim()) {
+    ElMessage.warning('请输入文字内容')
+    return
+  }
+
+  // 将文字内容存储到 localStorage，方便编辑页面获取
+  localStorage.setItem('cardText', inputText.value)
+
+  // 跳转到编辑页面
+  router.push('/editor')
 }
 </script>
 
@@ -60,17 +75,28 @@ const generateCard = () => {
           class="mb-8 transition-all duration-300 hover:shadow-sm"
         />
 
-        <div class="flex justify-center">
+        <div class="flex justify-center space-x-4">
           <el-button
             type="primary"
             size="large"
             :loading="isGenerating"
             :disabled="!inputText.trim()"
             @click="generateCard"
-            class="px-10 py-3 text-lg transform transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md"
+            class="px-6 py-3 text-lg transform transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md"
           >
             <i class="i-fa-solid:magic mr-2"></i>
             {{ isGenerating ? '生成中...' : '生成卡片' }}
+          </el-button>
+
+          <el-button
+            type="info"
+            size="large"
+            :disabled="!inputText.trim()"
+            @click="designCard"
+            class="px-6 py-3 text-lg transform transition-all duration-300 hover:translate-y-[-3px] hover:shadow-md"
+          >
+            <i class="i-fa-solid:edit mr-2"></i>
+            设计卡片
           </el-button>
         </div>
       </div>
