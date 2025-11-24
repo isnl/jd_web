@@ -2,11 +2,11 @@
 const isDev = import.meta.env.MODE === 'development'
 import axios from 'axios'
 import { useLoginStore } from '@/stores/login'
-import { useTokenStore } from '@/stores/token'
+import { useAuthStore } from '@/stores/auth'
 import { ElMessage } from 'element-plus'
 // 创建 axios 实例
 const axiosInstance = axios.create({
-  baseURL: isDev ? 'https://api.xxxxx.com/' : '/',
+  baseURL: isDev ? 'https://ai.iiter.cn' : 'https://ai.iiter.cn',
   timeout: 60 * 1000 // TODO: 请求超时时间
 })
 const err = (error) => {
@@ -44,9 +44,10 @@ const err = (error) => {
 }
 axiosInstance.interceptors.request.use(
   (config) => {
-    const tokenStore = useTokenStore()
-    const BearerToken = `Bearer ${tokenStore.token}`
-    config.headers['authorization'] = BearerToken // 让每个请求携带自定义 token 请根据实际情况自行修改
+    const authStore = useAuthStore()
+    if (authStore.accessToken) {
+      config.headers['authorization'] = `Bearer ${authStore.accessToken}`
+    }
     return config
   },
   (error) => {

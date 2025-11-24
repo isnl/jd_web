@@ -12,6 +12,7 @@ export default defineConfig({
       scale: 1.2,
       warn: true,
       collections: {
+        'carbon': () => import('@iconify/json/json/carbon.json').then((i) => i.default),
         'fa-solid': () => import('@iconify/json/json/fa-solid.json').then((i) => i.default),
         'fa-regular': () => import('@iconify/json/json/fa-regular.json').then((i) => i.default),
         'fa-brands': () => import('@iconify/json/json/fa-brands.json').then((i) => i.default)
