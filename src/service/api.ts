@@ -4,24 +4,23 @@ import type { JdUserInfo } from '@/stores/jdUser'
 // 认证相关
 export const authApi = {
   // 微信登录
-  wechatLogin: (code: string, inviteCode: string) =>
-    post('/api/auth/wechat', { code, inviteCode })
+  wechatLogin: (code: string, inviteCode: string) => post('/auth/wechat', { code, inviteCode })
 }
 
 // 用户信息相关
 export const userApi = {
   // 获取用户信息
-  getUserInfo: () => get('/api/jd_user'),
+  getUserInfo: () => get('/jd/user'),
 
   // 更新用户信息
   updateUserInfo: (data: { nickname?: string; phone?: string; paymentQrCode?: string }) =>
-    put('/api/jd_user', data),
+    put('/jd/user', data),
 
   // 上传收款码图片
   uploadPaymentQr: (file: File) => {
     const formData = new FormData()
     formData.append('file', file)
-    return post('/api/jd_user/upload', formData, {
+    return post('/jd/user/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   }
@@ -30,10 +29,10 @@ export const userApi = {
 // 京东转链相关
 export const jdApi = {
   // 转链
-  convert: (content: string) => post('/api/jd/convert', { content }),
+  convert: (content: string) => post('/jd/convert', { content }),
 
   // 获取今日群列表
-  getGroupList: () => get('/api/jd')
+  getGroupList: () => get('/jd')
 }
 
 // 订单相关
@@ -74,10 +73,10 @@ export interface OrderSummary {
 
 export const orderApi = {
   // 获取订单列表
-  getOrders: (params: OrderListParams) => get('/api/jd_order', params),
+  getOrders: (params: OrderListParams) => get('/jd/order', params),
 
   // 绑定订单
-  bindOrders: (orderIds: string[]) => post('/api/jd_order', { orderIds })
+  bindOrders: (orderIds: string[]) => post('/jd/order', { orderIds })
 }
 
 // 结算相关
@@ -94,10 +93,8 @@ export interface PaymentRecord {
 
 export const paymentApi = {
   // 获取结算记录列表
-  getRecords: (params?: { page?: number; pageSize?: number }) =>
-    get('/api/jd_payment_record', params),
+  getRecords: (params?: { page?: number; pageSize?: number }) => get('/jd/payment_record', params),
 
   // 申请提现
-  applyWithdraw: (monthDate: string) =>
-    post('/api/jd_payment_record/apply', { monthDate })
+  applyWithdraw: (monthDate: string) => post('/jd/payment_record/apply', { monthDate })
 }

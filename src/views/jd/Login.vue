@@ -208,7 +208,7 @@ const handleLogin = async () => {
     // 邀请码选填，没填就传空字符串
     const inviteCode = form.value.inviteCode.trim() || ''
     const res = await authApi.wechatLogin(code, inviteCode)
-    authStore.setTokens(res.data.accessToken, res.data.refreshToken)
+    await authStore.setTokens(res.data.accessToken, res.data.refreshToken)
 
     // 获取用户信息
     const userRes = await userApi.getUserInfo()
