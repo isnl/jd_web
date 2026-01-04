@@ -1,20 +1,16 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 space-y-4">
+  <div class="p-4 md:p-6 space-y-4 md:space-y-6">
     <!-- 用户信息卡片 -->
     <div class="bg-white rounded-2xl p-5 shadow-sm">
       <div class="flex items-center gap-4">
-        <div class="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-          <img
-            v-if="userInfo?.avatar"
-            :src="userInfo.avatar"
-            class="w-full h-full object-cover"
-          />
-          <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-            <span class="i-carbon-user text-3xl"></span>
-          </div>
+        <div
+          class="w-16 h-16 rounded-full flex-shrink-0 flex items-center justify-center text-white text-2xl font-medium"
+          :style="{ backgroundColor: getAvatarColor(userInfo?.nickname) }"
+        >
+          {{ getAvatarText(userInfo?.nickname) }}
         </div>
         <div class="flex-1 min-w-0">
-          <div class="text-lg font-medium text-gray-800">{{ userInfo?.name || '未设置昵称' }}</div>
+          <div class="text-lg font-medium text-gray-800">{{ userInfo?.nickname || '未设置昵称' }}</div>
           <div class="text-sm text-gray-500">{{ userInfo?.phone || '未绑定手机号' }}</div>
         </div>
       </div>
@@ -82,24 +78,6 @@
           </button>
           <p class="text-xs text-gray-400 mt-2">支持 JPG、PNG、GIF、WEBP 格式，最大5MB</p>
         </div>
-
-        <!-- 邀请码（只读） -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-2">我的邀请码</label>
-          <div class="flex items-center gap-2">
-            <input
-              :value="userInfo?.inviteCode"
-              readonly
-              class="flex-1 px-4 py-2.5 bg-gray-100 rounded-xl text-gray-800"
-            />
-            <button
-              @click="copyInviteCode"
-              class="px-3 py-2.5 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
-            >
-              复制
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- 保存按钮 -->
@@ -138,6 +116,30 @@ const jdUserStore = useJdUserStore()
 const authStore = useAuthStore()
 
 const userInfo = computed(() => jdUserStore.userInfo)
+
+// 头像颜色列表
+const avatarColors = [
+  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+  '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+  '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+  '#ec4899', '#f43f5e'
+]
+
+// 根据昵称生成头像颜色
+const getAvatarColor = (nickname?: string) => {
+  if (!nickname) return avatarColors[0]
+  let hash = 0
+  for (let i = 0; i < nickname.length; i++) {
+    hash = nickname.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return avatarColors[Math.abs(hash) % avatarColors.length]
+}
+
+// 获取头像文字
+const getAvatarText = (nickname?: string) => {
+  if (!nickname) return '用'
+  return nickname.charAt(0)
+}
 
 const form = ref({
   nickname: '',
@@ -231,17 +233,6 @@ const handleSave = async () => {
     // 错误已处理
   } finally {
     saving.value = false
-  }
-}
-
-// 复制邀请码
-const copyInviteCode = async () => {
-  if (!userInfo.value?.inviteCode) return
-  try {
-    await navigator.clipboard.writeText(userInfo.value.inviteCode)
-    ElMessage.success('复制成功')
-  } catch {
-    ElMessage.error('复制失败')
   }
 }
 

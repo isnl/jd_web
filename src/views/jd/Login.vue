@@ -98,39 +98,6 @@
           </div>
         </div>
 
-        <!-- 邀请码切换按钮 -->
-        <div v-if="!showInviteInput">
-          <button
-            @click="showInviteInput = true"
-            class="w-full py-3 bg-orange-50 text-orange-600 font-medium rounded-xl hover:bg-orange-100 transition flex items-center justify-center gap-2"
-          >
-            <span class="i-carbon-user-identification"></span>
-            <span>我有邀请码</span>
-            <span class="i-carbon-chevron-down"></span>
-          </button>
-        </div>
-
-        <!-- 邀请码输入（展开后显示） -->
-        <div v-else class="space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="text-sm font-medium text-gray-700">邀请码</label>
-            <button
-              @click="hideInviteInput"
-              class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1"
-            >
-              <span>收起</span>
-              <span class="i-carbon-chevron-up"></span>
-            </button>
-          </div>
-          <input
-            v-model="form.inviteCode"
-            type="text"
-            placeholder="请输入邀请码"
-            class="w-full px-4 py-3 bg-gray-50 border-none rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition"
-            autofocus
-          />
-        </div>
-
         <!-- 登录按钮 -->
         <button
           @click="handleLogin"
@@ -169,10 +136,6 @@ const jdUserStore = useJdUserStore()
 const loading = ref(false)
 const qrcodeError = ref(false)
 const codeInput = ref('') // 用户输入的验证码部分（不含JD_前缀）
-const showInviteInput = ref(false) // 邀请码是选填的，默认隐藏
-const form = ref({
-  inviteCode: ''
-})
 
 const isFormValid = computed(() => {
   // 只有验证码是必填的
@@ -192,12 +155,6 @@ const handlePaste = (e: ClipboardEvent) => {
   }
 }
 
-// 隐藏邀请码输入框
-const hideInviteInput = () => {
-  showInviteInput.value = false
-  form.value.inviteCode = ''
-}
-
 const handleLogin = async () => {
   if (!isFormValid.value) return
 
@@ -205,9 +162,7 @@ const handleLogin = async () => {
   try {
     // 提交时拼接 JD_ 前缀
     const code = `JD_${codeInput.value.trim()}`
-    // 邀请码选填，没填就传空字符串
-    const inviteCode = form.value.inviteCode.trim() || ''
-    const res = await authApi.wechatLogin(code, inviteCode)
+    const res = await authApi.wechatLogin(code)
     await authStore.setTokens(res.data.accessToken, res.data.refreshToken)
 
     // 获取用户信息

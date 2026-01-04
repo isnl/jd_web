@@ -24,6 +24,11 @@ const router = createRouter({
           component: () => import('../views/jd/Convert.vue')
         },
         {
+          path: 'deals',
+          name: 'deals',
+          component: () => import('../views/jd/Deals.vue')
+        },
+        {
           path: 'orders',
           name: 'orders',
           component: () => import('../views/jd/Orders.vue')

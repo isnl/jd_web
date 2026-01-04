@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 space-y-4">
+  <div class="p-4 md:p-6 space-y-4 md:space-y-6">
     <!-- 标题 -->
     <div class="bg-white rounded-2xl p-5 shadow-sm">
       <h2 class="text-lg font-medium text-gray-800">结算记录</h2>

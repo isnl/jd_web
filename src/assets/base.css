@@ -83,3 +83,17 @@ button {
 button:disabled {
   cursor: not-allowed;
 }
+
+/* 表单输入全局样式 */
+input,
+textarea {
+  outline: none;
+  border: none;
+}
+
+/* 移除浏览器默认的focus-visible黑色边框 */
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: none;
+}

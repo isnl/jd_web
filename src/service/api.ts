@@ -4,7 +4,7 @@ import type { JdUserInfo } from '@/stores/jdUser'
 // 认证相关
 export const authApi = {
   // 微信登录
-  wechatLogin: (code: string, inviteCode: string) => post('/auth/wechat', { code, inviteCode })
+  wechatLogin: (code: string) => post('/auth/wechat', { code })
 }
 
 // 用户信息相关
@@ -75,8 +75,8 @@ export const orderApi = {
   // 获取订单列表
   getOrders: (params: OrderListParams) => get('/jd/order', params),
 
-  // 绑定订单
-  bindOrders: (orderIds: string[]) => post('/jd/order', { orderIds })
+  // 绑定单个订单
+  bindOrder: (orderId: string, bind: boolean = true) => post('/jd/order', { orderId, bind })
 }
 
 // 结算相关

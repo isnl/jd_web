@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 space-y-4">
+  <div class="p-4 md:p-6 space-y-4 md:space-y-6">
     <!-- 月份选择和绑定订单 -->
     <div class="bg-white rounded-2xl p-5 shadow-sm">
       <div class="flex items-center justify-between mb-4">
@@ -32,7 +32,7 @@
     </div>
 
     <!-- 统计卡片 -->
-    <div v-if="summary" class="grid grid-cols-2 gap-3">
+    <div v-if="summary" class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
       <div class="bg-white rounded-xl p-4 shadow-sm">
         <div class="text-xs text-gray-500 mb-1">预估佣金</div>
         <div class="text-xl font-bold text-red-500">¥{{ summary.totalEstimateFee.toFixed(2) }}</div>
@@ -120,7 +120,7 @@
     </div>
 
     <!-- 绑定订单弹窗 -->
-    <el-dialog v-model="showBindModal" title="绑定订单" width="90%" max-width="400px">
+    <el-dialog v-model="showBindModal" title="绑定订单" width="600px" max-width="600px">
       <div class="space-y-4">
         <textarea
           v-model="bindOrderIds"
@@ -229,20 +229,36 @@ const bindLoading = ref(false)
 const handleBindOrders = async () => {
   const ids = bindOrderIds.value
     .split('\n')
-    .map(id => id.trim())
-    .filter(id => id)
+    .map((id) => id.trim())
+    .filter((id) => id)
 
   if (ids.length === 0) return
 
   bindLoading.value = true
+  const results: { success: string[]; failed: string[] } = { success: [], failed: [] }
+
   try {
-    await orderApi.bindOrders(ids)
-    ElMessage.success('绑定成功')
-    showBindModal.value = false
-    bindOrderIds.value = ''
-    fetchOrders()
-  } catch (error) {
-    // 错误已处理
+    for (const orderId of ids) {
+      try {
+        await orderApi.bindOrder(orderId)
+        results.success.push(orderId)
+      } catch {
+        results.failed.push(orderId)
+      }
+    }
+
+    if (results.success.length > 0) {
+      ElMessage.success(`成功绑定 ${results.success.length} 个订单`)
+    }
+    if (results.failed.length > 0) {
+      ElMessage.warning(`${results.failed.length} 个订单绑定失败`)
+    }
+
+    if (results.success.length > 0) {
+      showBindModal.value = false
+      bindOrderIds.value = ''
+      fetchOrders()
+    }
   } finally {
     bindLoading.value = false
   }
@@ -269,9 +285,7 @@ const getStatusText = (validCode: number) => {
 }
 
 const getStatusClass = (validCode: number) => {
-  return validCode === 17
-    ? 'bg-green-100 text-green-600'
-    : 'bg-yellow-100 text-yellow-600'
+  return validCode === 17 ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
 }
 
 onMounted(() => {

@@ -1,78 +1,62 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 space-y-4">
-    <!-- 转链卡片 -->
-    <div class="bg-white rounded-2xl p-5 shadow-sm">
-      <h2 class="text-lg font-medium text-gray-800 mb-4">商品转链</h2>
+  <div class="p-4 md:p-6 space-y-4 md:space-y-6">
+    <!-- 转链区域：左右两列布局 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <!-- 左侧：输入区域 -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm flex flex-col">
+        <h2 class="text-lg font-medium text-gray-800 mb-4">商品转链/文案转链</h2>
 
-      <!-- 输入框 -->
-      <div class="mb-4">
-        <textarea
-          v-model="content"
-          placeholder="请输入京东商品链接或商品ID"
-          rows="3"
-          class="w-full px-4 py-3 bg-gray-50 rounded-xl text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition"
-        ></textarea>
-      </div>
+        <!-- 输入框 -->
+        <div class="flex-1 mb-4">
+          <textarea
+            v-model="content"
+            placeholder="请输入京东商品链接、商品ID或包含链接的文案"
+            class="w-full h-full min-h-80 px-4 py-3 bg-gray-50 rounded-xl text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition"
+          ></textarea>
+        </div>
 
-      <!-- 转链按钮 -->
-      <button
-        @click="handleConvert"
-        :disabled="loading || !content.trim()"
-        class="w-full py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 active:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
-      >
-        <span v-if="loading" class="i-carbon-loading animate-spin"></span>
-        <span>{{ loading ? '转链中...' : '立即转链' }}</span>
-      </button>
-    </div>
-
-    <!-- 转链结果 -->
-    <div v-if="result" class="bg-white rounded-2xl p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-medium text-gray-800">转链结果</h3>
-        <span
-          :class="result.clickURL ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'"
-          class="text-xs px-2 py-1 rounded-full"
+        <!-- 转链按钮 -->
+        <button
+          @click="handleConvert"
+          :disabled="loading || !content.trim()"
+          class="w-full py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 active:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
         >
-          {{ result.clickURL ? '转链成功' : '转链失败' }}
-        </span>
+          <span v-if="loading" class="i-carbon-loading animate-spin"></span>
+          <span>{{ loading ? '转链中...' : '立即转链' }}</span>
+        </button>
       </div>
 
-      <!-- 短链接 -->
-      <div class="mb-3">
-        <label class="text-xs text-gray-500 mb-1 block">推广短链接</label>
-        <div class="flex items-center gap-2">
-          <input
-            :value="result.shortURL"
-            readonly
-            class="flex-1 px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-800 truncate"
-          />
-          <button
-            @click="copyToClipboard(result.shortURL)"
-            class="px-3 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition flex items-center gap-1"
+      <!-- 右侧：结果区域 -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-medium text-gray-800">转链结果</h3>
+          <span
+            v-if="result"
+            :class="result.convertedCount > 0 ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'"
+            class="text-xs px-2 py-1 rounded-full"
           >
-            <span class="i-carbon-copy"></span>
-            复制
-          </button>
+            {{ result.convertedCount > 0 ? `成功转链 ${result.convertedCount}/${result.totalLinks}` : '未找到链接' }}
+          </span>
         </div>
-      </div>
 
-      <!-- 长链接 -->
-      <div v-if="result.clickURL">
-        <label class="text-xs text-gray-500 mb-1 block">完整推广链接</label>
-        <div class="flex items-center gap-2">
-          <input
-            :value="result.clickURL"
-            readonly
-            class="flex-1 px-3 py-2 bg-gray-50 rounded-lg text-sm text-gray-800 truncate"
-          />
-          <button
-            @click="copyToClipboard(result.clickURL)"
-            class="px-3 py-2 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition flex items-center gap-1"
-          >
-            <span class="i-carbon-copy"></span>
-            复制
-          </button>
+        <!-- 转链内容 -->
+        <div class="flex-1 mb-4">
+          <textarea
+            v-model="resultContent"
+            :placeholder="result ? '' : '转链结果将显示在这里...'"
+            class="w-full h-full min-h-80 px-4 py-3 bg-gray-50 rounded-xl text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition"
+          ></textarea>
         </div>
+
+        <!-- 复制按钮 -->
+        <button
+          @click="copyToClipboard(resultContent)"
+          :disabled="!resultContent"
+          class="w-full py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+        >
+          <span class="i-carbon-copy"></span>
+          复制内容
+        </button>
       </div>
     </div>
 
@@ -98,13 +82,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { jdApi } from '@/service/api'
 
 const content = ref('')
 const loading = ref(false)
-const result = ref<{ shortURL: string; clickURL: string } | null>(null)
+const result = ref<{ content: string; convertedCount: number; totalLinks: number } | null>(null)
+const resultContent = ref('')
+
+// 京东短链正则
+const JD_LINK_REG = /(https:\/\/)?(u\.jd\.com\/)[a-zA-Z0-9]{6,7}/g
+
+// 检测剪贴板
+const checkClipboard = async () => {
+  try {
+    const clipboardText = await navigator.clipboard.readText()
+    if (clipboardText && JD_LINK_REG.test(clipboardText)) {
+      // 重置正则lastIndex
+      JD_LINK_REG.lastIndex = 0
+
+      await ElMessageBox.confirm(
+        '检测到剪贴板中包含京东链接，是否自动获取并转链？',
+        '智能识别',
+        {
+          confirmButtonText: '立即转链',
+          cancelButtonText: '取消',
+          type: 'info'
+        }
+      )
+
+      content.value = clipboardText
+      handleConvert()
+    }
+  } catch {
+    // 用户拒绝剪贴板权限或取消操作，静默处理
+  }
+}
 
 const handleConvert = async () => {
   if (!content.value.trim()) return
@@ -113,10 +127,11 @@ const handleConvert = async () => {
   try {
     const res = await jdApi.convert(content.value)
     result.value = res.data
-    if (res.data.clickURL) {
+    resultContent.value = res.data.content
+    if (res.data.convertedCount > 0) {
       ElMessage.success('转链成功')
     } else {
-      ElMessage.warning('转链失败，返回原内容')
+      ElMessage.warning('未找到可转链的链接')
     }
   } catch (error) {
     // 错误已在拦截器处理
@@ -133,4 +148,9 @@ const copyToClipboard = async (text: string) => {
     ElMessage.error('复制失败')
   }
 }
+
+// 页面加载时检测剪贴板
+onMounted(() => {
+  checkClipboard()
+})
 </script>

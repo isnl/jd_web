@@ -42,7 +42,14 @@ export default defineConfig({
       pht: "font-['pht']",
       pmzdbtt: 'font-[pmzdbtt]',
       textPrimary: 'text-#5c79f6',
-      bgPrimary: 'bg-#5c79f6'
+      bgPrimary: 'bg-#5c79f6',
+      // 桌面端常用快捷类
+      'card': 'bg-white rounded-2xl shadow-sm',
+      'card-padding': 'p-4 md:p-6',
+      'page-container': 'p-4 md:p-6 space-y-4 md:space-y-6',
+      'sidebar-item': 'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+      'sidebar-item-active': 'bg-red-50 text-red-500',
+      'sidebar-item-inactive': 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
     }
   ],
   transformers: [transformerVariantGroup()]
