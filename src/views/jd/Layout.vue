@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="h-screen bg-gray-50 overflow-hidden">
     <!-- PC端布局：侧边栏 + 内容区 -->
-    <div class="flex">
+    <div class="flex h-full">
       <!-- 侧边栏导航 (PC端显示) -->
       <aside class="hidden md:flex w-60 bg-white border-r border-gray-200 fixed left-0 top-0 h-screen flex-col z-50">
         <!-- Logo区域 -->
@@ -58,59 +58,33 @@
       </aside>
 
       <!-- 主内容区域 -->
-      <div class="flex-1 md:ml-60">
-        <!-- 顶部导航 (移动端显示完整，PC端简化) -->
-        <header class="bg-white shadow-sm sticky top-0 z-40">
-          <div class="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
-            <!-- 移动端：显示 Logo -->
-            <div class="flex items-center gap-3 md:hidden">
+      <div class="flex-1 md:ml-60 h-full flex flex-col overflow-hidden">
+        <!-- 顶部导航 (仅移动端显示) -->
+        <header class="md:hidden bg-white shadow-sm flex-shrink-0 z-40">
+          <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
                 <span class="text-white text-sm font-bold">京</span>
               </div>
               <span class="font-medium text-gray-800">东东返利</span>
             </div>
 
-            <!-- PC端：显示页面标题 -->
-            <div class="hidden md:block">
-              <h1 class="text-lg font-semibold text-gray-800">
-                {{ currentPageTitle }}
-              </h1>
-            </div>
-
-            <!-- 用户头像 (移动端显示) -->
+            <!-- 用户头像 -->
             <div
               v-if="jdUserStore.userInfo"
               @click="router.push('/profile')"
-              class="w-8 h-8 rounded-full cursor-pointer hover:ring-2 hover:ring-red-500 transition md:hidden flex items-center justify-center text-white text-sm font-medium"
+              class="w-8 h-8 rounded-full cursor-pointer hover:ring-2 hover:ring-red-500 transition flex items-center justify-center text-white text-sm font-medium"
               :style="{ backgroundColor: getAvatarColor(jdUserStore.userInfo.nickname) }"
             >
               {{ getAvatarText(jdUserStore.userInfo.nickname) }}
-            </div>
-
-            <!-- PC端：右侧工具栏 -->
-            <div class="hidden md:flex items-center gap-4">
-              <div
-                v-if="jdUserStore.userInfo"
-                @click="router.push('/profile')"
-                class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-3 py-2 transition"
-              >
-                <div
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                  :style="{ backgroundColor: getAvatarColor(jdUserStore.userInfo.nickname) }"
-                >
-                  {{ getAvatarText(jdUserStore.userInfo.nickname) }}
-                </div>
-                <span class="text-sm text-gray-700">
-                  {{ jdUserStore.userInfo.nickname || '用户' }}
-                </span>
-              </div>
             </div>
           </div>
         </header>
 
         <!-- 主内容区 -->
-        <main class="pb-20 md:pb-6">
-          <div class="max-w-7xl mx-auto">
+        <main class="flex-1 overflow-hidden pb-16 md:pb-0">
+          <div class="h-full max-w-7xl mx-auto">
             <router-view />
           </div>
         </main>
@@ -138,12 +112,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useJdUserStore } from '@/stores/jdUser'
 
 const router = useRouter()
-const route = useRoute()
 const jdUserStore = useJdUserStore()
 
 const navItems = [
@@ -153,12 +125,6 @@ const navItems = [
   { path: '/settlement', label: '结算', icon: 'i-carbon-currency-dollar' },
   { path: '/profile', label: '我的', icon: 'i-carbon-user-avatar' }
 ]
-
-// 当前页面标题
-const currentPageTitle = computed(() => {
-  const item = navItems.find(nav => nav.path === route.path)
-  return item?.label || '东东返利'
-})
 
 // 头像颜色列表
 const avatarColors = [

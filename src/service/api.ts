@@ -40,6 +40,7 @@ export interface OrderListParams {
   monthDate: string
   page?: number
   pageSize?: number
+  status?: 'completed' | 'paid' | 'abnormal'
 }
 
 export interface OrderItem {
@@ -58,6 +59,11 @@ export interface OrderItem {
   validCode: number
   proPriceAmount: number
   createdAt: string
+  updatedAt: string
+  price?: number
+  plus?: boolean
+  orderTime?: string
+  parentId?: number
 }
 
 export interface OrderSummary {
@@ -67,6 +73,7 @@ export interface OrderSummary {
   totalActualCosPrice: number
   settledCount: number
   unsettledCount: number
+  abnormalCount: number
   hasApplied: boolean
   paymentStatus?: number
 }
@@ -75,8 +82,15 @@ export const orderApi = {
   // 获取订单列表
   getOrders: (params: OrderListParams) => get('/jd/order', params),
 
+  // 获取订单汇总
+  getSummary: (monthDate: string) => get('/jd/order/summary', { monthDate }),
+
   // 绑定单个订单
-  bindOrder: (orderId: string, bind: boolean = true) => post('/jd/order', { orderId, bind })
+  bindOrder: (orderId: string, bind: boolean = true) => post('/jd/order', { orderId, bind }),
+
+  // 批量刷新订单状态（同步接口，可能需要较长时间）
+  refreshOrders: (monthDate: string) =>
+    post('/jd/order/refresh', { monthDate }, { timeout: 120000 })
 }
 
 // 结算相关

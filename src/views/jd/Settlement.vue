@@ -77,7 +77,7 @@
         </li>
         <li class="flex items-start gap-2">
           <span class="i-carbon-checkmark-outline text-red-500 mt-0.5 flex-shrink-0"></span>
-          <span>只有已结算订单（validCode=17）才计入提现金额</span>
+          <span>只有已结算订单才计入提现金额</span>
         </li>
         <li class="flex items-start gap-2">
           <span class="i-carbon-checkmark-outline text-red-500 mt-0.5 flex-shrink-0"></span>
@@ -132,7 +132,11 @@ const getStatusClass = (status: number) => {
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
+    date.getDate()
+  ).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(
+    date.getMinutes()
+  ).padStart(2, '0')}`
 }
 
 onMounted(() => {
